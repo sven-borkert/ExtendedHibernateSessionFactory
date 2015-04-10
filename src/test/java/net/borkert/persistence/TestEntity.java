@@ -8,7 +8,7 @@ import java.util.Date;
 public class TestEntity {
 
   @Id
-  @SequenceGenerator(name="seq_test", sequenceName="seq_test", allocationSize = 1)
+  @SequenceGenerator(name = "seq_test", sequenceName = "seq_test", allocationSize = 1)
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_test")
   private long id;
 

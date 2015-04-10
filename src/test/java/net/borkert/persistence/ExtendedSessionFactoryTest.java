@@ -345,11 +345,11 @@ public class ExtendedSessionFactoryTest {
     entityList = esf.load(TestEntity.class, 0, 4, "id", true, filters, "timestamp", d1, d2);
     assertNotNull(entityList);
     assertEquals(2, entityList.size());
-    int max = esf.loadMaxCount(TestEntity.class,filters);
-    assertEquals(4,max);
+    int max = esf.loadMaxCount(TestEntity.class, filters);
+    assertEquals(4, max);
     filters.put("name", "Test 1");
-    max = esf.loadMaxCount(TestEntity.class,filters);
-    assertEquals(1,max);
+    max = esf.loadMaxCount(TestEntity.class, filters);
+    assertEquals(1, max);
   }
 
   @Test

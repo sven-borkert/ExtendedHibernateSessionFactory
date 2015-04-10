@@ -7,14 +7,14 @@
               http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
-        <property name="url" value="jdbc:hsqldb:mem:counterdb" />
-        <property name="username" value="sa" />
-        <property name="password" value="" />
-        <property name="initialSize" value="1" />
-        <property name="maxActive" value="1" />
-        <property name="poolPreparedStatements" value="false" />
-        <property name="maxOpenPreparedStatements" value="1" />
+        <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+        <property name="url" value="jdbc:hsqldb:mem:counterdb"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+        <property name="initialSize" value="1"/>
+        <property name="maxActive" value="1"/>
+        <property name="poolPreparedStatements" value="false"/>
+        <property name="maxOpenPreparedStatements" value="1"/>
     </bean>
 
     <bean id="hibernateSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">

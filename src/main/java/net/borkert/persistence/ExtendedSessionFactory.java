@@ -143,7 +143,7 @@ public class ExtendedSessionFactory {
     return result.size() > 0 ? result.get(0) : null;
   }
 
-  public <T> List<T> load(Class type, int first, int pageSize, String sortField, boolean sortAsc, Map<String, String> filters) {
+  public <T> List<T> load(Class type, int first, int pageSize, String sortField, boolean sortAsc, Map<String, Object> filters) {
     DetachedCriteria query = createFilterCriteria(type, filters);
     if (sortField != null && !sortField.equals("")) {
       if (sortAsc) {
@@ -155,7 +155,7 @@ public class ExtendedSessionFactory {
     return query.getExecutableCriteria(getSessionFactory().getCurrentSession()).setFirstResult(first).setMaxResults(pageSize).list();
   }
 
-  public <T> List<T> load(Class type, int first, int pageSize, String sortField, boolean sortAsc, Map<String, String> filters, String dateProperty, Date from, Date to) {
+  public <T> List<T> load(Class type, int first, int pageSize, String sortField, boolean sortAsc, Map<String, Object> filters, String dateProperty, Date from, Date to) {
     DetachedCriteria query = createFilterCriteria(type, filters);
     if (from != null) {
       query.add(Restrictions.ge(dateProperty, from));
@@ -173,7 +173,7 @@ public class ExtendedSessionFactory {
     return query.getExecutableCriteria(getSessionFactory().getCurrentSession()).setFirstResult(first).setMaxResults(pageSize).list();
   }
 
-  public int loadMaxCount(Class type, Map<String, String> filters) {
+  public int loadMaxCount(Class type, Map<String, Object> filters) {
     DetachedCriteria query = createFilterCriteria(type, filters);
     ProjectionList projectList = Projections.projectionList();
     projectList.add(Projections.alias(Projections.rowCount(), "count"));
@@ -197,27 +197,55 @@ public class ExtendedSessionFactory {
     return sessionFactory;
   }
 
-  private DetachedCriteria createFilterCriteria(Class type, Map<String, String> filters) {
+  private DetachedCriteria createFilterCriteria(Class type, Map<String, Object> filters) {
     DetachedCriteria query = DetachedCriteria.forClass(type);
     for (String property : filters.keySet()) {
-      if (getPropertyClassName(type, property).equals("java.lang.String")) {
-        query.add(Restrictions.like(property, "%" + filters.get(property) + "%"));
+      String[] parts = property.split("\\.");
+      if (parts.length > 2) {
+        throw new RuntimeException("Not implemented");
       }
-      try {
-        if (getPropertyClassName(type, property).equals("java.lang.Integer")) {
-          query.add(Restrictions.eq(property, Integer.parseInt(filters.get(property))));
+      if (!(filters.get(property) instanceof String)) {
+        throw new RuntimeException("Not implemented");
+      }
+      if (getPropertyClassName(type, property).equals("java.lang.String")) {
+        if (parts.length == 1) {
+          query.add(Restrictions.like(property, "%" + filters.get(property) + "%").ignoreCase());
         }
-        if (getPropertyClassName(type, property).equals("int")) {
-          query.add(Restrictions.eq(property, Integer.parseInt(filters.get(property))));
+        if (parts.length == 2) {
+          query.createAlias(parts[0], parts[0]).add(Restrictions.like(property, "%" + filters.get(property) + "%").ignoreCase());
         }
-        if (getPropertyClassName(type, property).equals("java.lang.Long")) {
-          query.add(Restrictions.eq(property, Long.parseLong(filters.get(property))));
+      }
+      if (getPropertyClassName(type, property).equals("java.lang.Integer")) {
+        if (parts.length == 1) {
+          query.add(Restrictions.eq(property, Integer.parseInt((String) filters.get(property))));
         }
-        if (getPropertyClassName(type, property).equals("long")) {
-          query.add(Restrictions.eq(property, Long.parseLong(filters.get(property))));
+        if (parts.length == 2) {
+          query.createAlias(parts[0], parts[0]).add(Restrictions.eq(property, Integer.parseInt((String) filters.get(property))));
         }
-      } catch (NumberFormatException ex) {
-        throw new ExtendedSessionFactoryException(ex);
+      }
+      if (getPropertyClassName(type, property).equals("int")) {
+        if (parts.length == 1) {
+          query.add(Restrictions.eq(property, Integer.parseInt((String) filters.get(property))));
+        }
+        if (parts.length == 2) {
+          query.createAlias(parts[0], parts[0]).add(Restrictions.eq(property, Integer.parseInt((String) filters.get(property))));
+        }
+      }
+      if (getPropertyClassName(type, property).equals("java.lang.Long")) {
+        if (parts.length == 1) {
+          query.add(Restrictions.eq(property, Long.parseLong((String) filters.get(property))));
+        }
+        if (parts.length == 2) {
+          query.createAlias(parts[0], parts[0]).add(Restrictions.eq(property, Long.parseLong((String) filters.get(property))));
+        }
+      }
+      if (getPropertyClassName(type, property).equals("long")) {
+        if (parts.length == 1) {
+          query.add(Restrictions.eq(property, Long.parseLong((String) filters.get(property))));
+        }
+        if (parts.length == 2) {
+          query.createAlias(parts[0], parts[0]).add(Restrictions.eq(property, Long.parseLong((String) filters.get(property))));
+        }
       }
     }
     return query;

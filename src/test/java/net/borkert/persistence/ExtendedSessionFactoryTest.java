@@ -327,7 +327,7 @@ public class ExtendedSessionFactoryTest {
     Thread.sleep(1000);
     long id = createTestObjectAndReturnId("Test 3");
     createTestObjectAndReturnId("Test 4");
-    Map<String, String> filters = new HashMap<>();
+    Map<String, Object> filters = new HashMap<>();
     List<TestEntity> entityList = esf.load(TestEntity.class, 0, 2, "id", true, filters);
     assertNotNull(entityList);
     assertEquals(2, entityList.size());

@@ -17,7 +17,7 @@
         <property name="maxOpenPreparedStatements" value="1"/>
     </bean>
 
-    <bean id="hibernateSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+    <bean id="hibernateSessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <property name="configLocation" value="classpath:net/borkert/persistence/hibernate.cfg.xml"/>
         <property name="dataSource" ref="dataSource"/>
         <property name="packagesToScan">
@@ -27,7 +27,7 @@
         </property>
     </bean>
 
-    <bean id="txManagerHibernate" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+    <bean id="txManagerHibernate" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
         <property name="sessionFactory" ref="hibernateSessionFactory"/>
         <property name="dataSource" ref="dataSource"/>
     </bean>

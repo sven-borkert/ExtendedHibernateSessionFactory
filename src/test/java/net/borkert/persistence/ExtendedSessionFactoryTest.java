@@ -7,6 +7,7 @@ import org.hibernate.criterion.Restrictions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,10 +26,10 @@ import static org.junit.Assert.*;
 @ContextConfiguration(locations = {"/net/borkert/persistence/ExtendedSessionFactoryTest.xml"})
 public class ExtendedSessionFactoryTest {
 
-  @Resource
+  @Autowired
   private SessionFactory sessionFactory;
 
-  @Resource
+  @Autowired
   private PlatformTransactionManager transactionManager;
 
   private TransactionTemplate transactionTemplate;
@@ -45,7 +45,7 @@ public class ExtendedSessionFactoryTest {
   @Test
   public void testSessionFactoryGetter() {
     ExtendedSessionFactory esf = new ExtendedSessionFactory(getSessionFactory());
-    assertTrue(esf.getSessionFactory() == getSessionFactory());
+    assertSame(esf.getSessionFactory(), getSessionFactory());
   }
 
   @Test
@@ -91,10 +91,10 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 1");
     createTestObjectAndReturnId("Test 2");
     List<TestEntity> entityList = esf.findAll(TestEntity.class);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     createTestObjectAndReturnId("Test 3");
     entityList = esf.findAll(TestEntity.class);
-    assertTrue(3 == entityList.size());
+    assertEquals(3, entityList.size());
   }
 
   @Test
@@ -104,9 +104,9 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 2");
     createTestObjectAndReturnId("Test 3");
     List<TestEntity> entityList = esf.findAll(TestEntity.class, 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     entityList = esf.findAll(TestEntity.class);
-    assertTrue(3 == entityList.size());
+    assertEquals(3, entityList.size());
   }
 
   @Test
@@ -124,11 +124,11 @@ public class ExtendedSessionFactoryTest {
     assertTrue(entityList.get(0).getId() > entityList.get(2).getId());
     assertTrue(entityList.get(0).getId() > entityList.get(1).getId());
     entityList = esf.findAll(TestEntity.class, Order.desc("id"), 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     assertTrue(entityList.get(0).getId() > entityList.get(1).getId());
     assertTrue(entityList.get(0).getId() > entityList.get(1).getId());
     entityList = esf.findAll(TestEntity.class, Order.desc("id"), 1, 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     assertTrue(entityList.get(0).getId() > entityList.get(1).getId());
   }
 
@@ -139,9 +139,9 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 2");
     createTestObjectAndReturnId("Test 3");
     List<TestEntity> entityList = esf.findByQuery(TestEntity.class, "from TestEntity");
-    assertTrue(3 == entityList.size());
+    assertEquals(3, entityList.size());
     entityList = esf.findByQuery(TestEntity.class, "from TestEntity l where l.name = 'Test 1'");
-    assertTrue(1 == entityList.size());
+    assertEquals(1, entityList.size());
   }
 
   @Test
@@ -151,9 +151,9 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 2");
     createTestObjectAndReturnId("Test 3");
     List<TestEntity> entityList = esf.findByQuery(TestEntity.class, "from TestEntity", 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     entityList = esf.findByQuery(TestEntity.class, "from TestEntity", 1);
-    assertTrue(1 == entityList.size());
+    assertEquals(1, entityList.size());
   }
 
   @Test
@@ -163,7 +163,7 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 2");
     createTestObjectAndReturnId("Test 3");
     List<TestEntity> entityList = esf.findByQuery(TestEntity.class, "from TestEntity e order by e.id", 1, 1);
-    assertTrue(1 == entityList.size());
+    assertEquals(1, entityList.size());
     assertEquals("Test 2", entityList.get(0).getName());
   }
 
@@ -176,7 +176,7 @@ public class ExtendedSessionFactoryTest {
     DetachedCriteria query = DetachedCriteria.forClass(TestEntity.class);
     query.add(Restrictions.eq("name", "Test 1"));
     List<TestEntity> entityList = esf.findByCriteria(TestEntity.class, query);
-    assertTrue(1 == entityList.size());
+    assertEquals(1, entityList.size());
     assertEquals("Test 1", entityList.get(0).getName());
   }
 
@@ -189,7 +189,7 @@ public class ExtendedSessionFactoryTest {
     DetachedCriteria query = DetachedCriteria.forClass(TestEntity.class);
     query.add(Restrictions.like("name", "Test%"));
     List<TestEntity> entityList = esf.findByCriteria(TestEntity.class, query, 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
   }
 
   @Test
@@ -201,7 +201,7 @@ public class ExtendedSessionFactoryTest {
     DetachedCriteria query = DetachedCriteria.forClass(TestEntity.class);
     query.add(Restrictions.like("name", "Test%"));
     List<TestEntity> entityList = esf.findByCriteria(TestEntity.class, query, Order.asc("name"));
-    assertTrue(3 == entityList.size());
+    assertEquals(3, entityList.size());
     assertEquals("Test 1", entityList.get(0).getName());
     assertEquals("Test 3", entityList.get(2).getName());
   }
@@ -215,7 +215,7 @@ public class ExtendedSessionFactoryTest {
     DetachedCriteria query = DetachedCriteria.forClass(TestEntity.class);
     query.add(Restrictions.like("name", "Test%"));
     List<TestEntity> entityList = esf.findByCriteria(TestEntity.class, query, Order.asc("name"), 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     assertEquals("Test 1", entityList.get(0).getName());
     assertEquals("Test 2", entityList.get(1).getName());
   }
@@ -229,7 +229,7 @@ public class ExtendedSessionFactoryTest {
     DetachedCriteria query = DetachedCriteria.forClass(TestEntity.class);
     query.add(Restrictions.like("name", "Test%"));
     List<TestEntity> entityList = esf.findByCriteria(TestEntity.class, query, Order.asc("name"), 1, 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     assertEquals("Test 2", entityList.get(0).getName());
     assertEquals("Test 3", entityList.get(1).getName());
   }
@@ -241,7 +241,7 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 2");
     createTestObjectAndReturnId("Test 3");
     List<TestEntity> entityList = esf.findByProperty(TestEntity.class, "name", "Test 1");
-    assertTrue(1 == entityList.size());
+    assertEquals(1, entityList.size());
     assertEquals("Test 1", entityList.get(0).getName());
   }
 
@@ -252,7 +252,7 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 1");
     createTestObjectAndReturnId("Test 1");
     List<TestEntity> entityList = esf.findByProperty(TestEntity.class, "name", "Test 1", Order.asc("id"));
-    assertTrue(3 == entityList.size());
+    assertEquals(3, entityList.size());
     assertTrue(entityList.get(0).getId() < entityList.get(1).getId());
     assertTrue(entityList.get(1).getId() < entityList.get(2).getId());
   }
@@ -264,7 +264,7 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 1");
     createTestObjectAndReturnId("Test 1");
     List<TestEntity> entityList = esf.findByProperty(TestEntity.class, "name", "Test 1", 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
   }
 
   @Test
@@ -274,7 +274,7 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 1");
     createTestObjectAndReturnId("Test 1");
     List<TestEntity> entityList = esf.findByProperty(TestEntity.class, "name", "Test 1", Order.asc("id"), 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     assertTrue(entityList.get(0).getId() < entityList.get(1).getId());
   }
 
@@ -285,7 +285,7 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 1");
     createTestObjectAndReturnId("Test 1");
     List<TestEntity> entityList = esf.findByProperty(TestEntity.class, "name", "Test 1", Order.desc("id"), 1, 2);
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
     assertTrue(entityList.get(0).getId() > entityList.get(1).getId());
   }
 
@@ -370,19 +370,19 @@ public class ExtendedSessionFactoryTest {
     createTestObjectAndReturnId("Test 2");
     createTestObjectAndReturnId("Test 3");
     List<TestEntity> entityList = esf.findByQuery(TestEntity.class, "from TestEntity");
-    assertTrue(3 == entityList.size());
+    assertEquals(3, entityList.size());
     entityList = esf.findByQuery(TestEntity.class, "from TestEntity l where l.name = 'Test 1'");
-    assertTrue(1 == entityList.size());
+    assertEquals(1, entityList.size());
     esf.makeTransient(entityList.get(0));
     entityList = esf.findByQuery(TestEntity.class, "from TestEntity");
-    assertTrue(2 == entityList.size());
+    assertEquals(2, entityList.size());
   }
 
   private long createTestObjectAndReturnId(String name) {
     TestEntity l = new TestEntity();
     l.setName(name);
     l.setTimestamp(new Date());
-    assertTrue(l.getId() == 0);
+    assertEquals(0, l.getId());
     esf.makePersistent(l);
     assertTrue(l.getId() > 0);
     return l.getId();
